@@ -1,0 +1,4 @@
+---
+nginx_repo:  http://nginx.org/packages/centos/{{ ((ansible_distribution == 'CentOS' and ansible_distribution_major_version|int == 7) or ansible_distribution == 'Amazon')  | ternary('7', '6') }}/$basearch/
+nginx: nginx
+service: nginx

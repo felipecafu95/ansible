@@ -1,0 +1,39 @@
+---
+- name: get rundeck version
+  shell: curl -L http://dl.bintray.com/rundeck/rundeck-deb/ | awk -F '"' '{print$2}' | tail -n3
+  register: rundeck_version
+  when: ansible_os_family == "Debian"
+
+- name: download rundeck
+  get_url:
+    url: http://dl.bintray.com/rundeck/rundeck-deb/{{ rundeck_version.stdout }}
+    dest: /tmp/
+    mode: 0644
+  when: ansible_os_family == "Debian"
+
+- name: install rundeck
+  apt:
+    deb: /tmp/{{ rundeck_version.stdout }}
+  when: ansible_os_family == "Debian"
+
+- name: download rundeck
+  yum:
+    name: "{{ rundeck_repo }}"
+    state: present
+  when: ansible_distribution == "Amazon" or ansible_distribution == "CentOS"
+
+- name: install rundeck
+  yum:
+    name: " {{ rundeck }} "
+    state: present
+  when: ansible_distribution == "Amazon" or ansible_distribution == "CentOS" 
+
+- name: start rundeck
+  service:
+    name: "{{ service }}"
+    state: started
+       
+- name: enable rundeck
+  service:
+    name: "{{ service }}"
+    enabled: yes    

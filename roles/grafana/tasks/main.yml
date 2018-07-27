@@ -1,0 +1,33 @@
+---
+- name: download grafana from source (deb)
+  get_url:
+    url: https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana_{{ grafana_version }}_amd64.deb 
+    dest: /tmp
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+
+- name: download grafana from source (rpm)
+  get_url:
+    url: https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana-{{ grafana_version }}-1.x86_64.rpm 
+    dest: /tmp
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Amazon"
+
+- name: install grafana (rpm)
+  yum:
+    name: /tmp/grafana-{{ grafana_version }}-1.x86_64.rpm 
+    state: present
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Amazon"
+  
+- name: install grafana (apt)
+  apt:
+    deb: /tmp/grafana_{{ grafana_version }}_amd64.deb 
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+
+- name: start grafana
+  service:
+    name: grafana-server
+    state: started
+
+- name: enable grafana
+  service:
+    name: grafana-server
+    enabled: yes

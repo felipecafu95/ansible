@@ -1,0 +1,12 @@
+---
+- name: upgrade all packages, excluding kernel & other related packages
+  yum:
+    name: '*'
+    state: latest
+    exclude: kernel*
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Amazon"
+  
+#- name: install some package
+#  yum:
+#    name: "{{ app }}"
+#    state: latest
