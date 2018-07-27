@@ -1,0 +1,13 @@
+[servers]
+10.76.0.19 ansible_user=centos
+10.76.0.41 ansible_user=centos
+10.76.0.62 ansible_user=centos
+10.76.0.73 ansible_user=centos
+10.76.0.101 ansible_user=ec2-user
+10.76.0.206 ansible_user=ec2-user
+10.76.0.242 ansible_user=ec2-user
+10.76.1.163 ansible_user=ec2-user
+10.76.1.170 ansible_user=ec2-user
+10.76.1.181 ansible_user=ec2-user
+10.76.1.204 ansible_user=ec2-user
+10.76.1.248 ansible_user=ec2-user
