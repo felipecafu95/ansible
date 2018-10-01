@@ -11,7 +11,7 @@ This repository contains some Ansible roles to provisioning any resources like N
 
 Make sure do you change to your host, user and access key.
 
-The change should be made in 'yourdirectory/ansible/inventory/hosts'
+The change should be made in `'yourdirectory/ansible/inventory/hosts'`
 
 You can the example below:
 
