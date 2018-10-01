@@ -21,6 +21,10 @@ You can the example below:
 
 ### Example ###
 
+You can run the playbook with:
+
+`ansible-playbook -i ../inventory/hosts playbook.yml`
+
 A basic example. Provisioning nginx web server in a new instance.
 
 ![](https://i.imgur.com/4qKcUI5.gif)
