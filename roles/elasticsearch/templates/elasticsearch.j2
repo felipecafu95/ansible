@@ -14,7 +14,7 @@
 #
 # Use a descriptive name for your cluster:
 #
-cluster.name: vr-elk
+cluster.name: "{{ cluster_name }}"
 #
 # ------------------------------------ Node ------------------------------------
 #
@@ -30,11 +30,11 @@ cluster.name: vr-elk
 #
 # Path to directory where to store the data (separate multiple locations by comma):
 #
-path.data: /var/lib/elasticsearch
+path.data: "{{ data_path }}"
 #
 # Path to log files:
 #
-path.logs: /var/log/elasticsearch
+path.logs: "{{ log_path }}"
 #
 # ----------------------------------- Memory -----------------------------------
 #

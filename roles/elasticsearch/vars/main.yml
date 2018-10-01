@@ -1,2 +1,5 @@
 ---
 version: 6.4.0
+cluster_name: my_cluster
+log_path: /var/log/elasticsearch
+data_path: /var/lib/elasticsearch
