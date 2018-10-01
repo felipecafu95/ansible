@@ -5,6 +5,7 @@ This repository contains some Ansible roles to provisioning any resources like N
 ### Requirements ###
 
 * [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+* [Python 3.x](https://www.python.org/downloads/)
 
 
 ### Before you running the playbook ###
