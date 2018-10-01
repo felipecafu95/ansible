@@ -1,3 +1,0 @@
----
-VERSION_STABLE: v1.11.2
-KUBES: kubeadm, kubectl, kubelet
