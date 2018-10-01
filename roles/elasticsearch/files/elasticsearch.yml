@@ -14,7 +14,7 @@
 #
 # Use a descriptive name for your cluster:
 #
-cluster.name: vr-elk
+cluster.name: my-cluster #CHANGEME
 #
 # ------------------------------------ Node ------------------------------------
 #
