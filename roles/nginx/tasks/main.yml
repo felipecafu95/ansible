@@ -1,0 +1,40 @@
+---
+- name: add nginx repository
+  yum_repository:
+    name: nginx
+    description: nginx 
+    baseurl: "{{ nginx_repo }}"
+    gpgcheck: no 
+    enabled: yes
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Amazon"
+
+- name: download nginx
+  yum:
+    name: "{{ nginx }}"
+    state: present
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Amazon"
+
+- name: install nginx
+  yum:
+    name: "{{ nginx }}"
+    state: present
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Amazon"
+
+- name: install nginx (apt)
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - nginx
+    - nginx-common
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+
+- name: start nginx
+  service:
+    name: nginx
+    state: started
+
+- name: enable nginx
+  service:
+    name: nginx
+    enabled: yes

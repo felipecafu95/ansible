@@ -1,0 +1,87 @@
+---
+
+- name: Download Wordpress from the source
+  get_url:
+    url: https://wordpress.org/latest.zip
+    dest: /tmp/
+  register: wordpress
+
+- name: Create database for Wordpress
+  mysql_db:
+    name: "{{ user }}"
+    state: present
+
+- name: Create user and password for access the wordpress database
+  mysql_user:
+    name: "{{ user }}"
+    password: "{{ password }}"
+    priv: '*.*:ALL'
+    state: present
+
+- name: Descompressing Wordpress zip package
+  unarchive:
+    src: "{{ wordpress.dest }}"
+    dest: /tmp/
+    remote_src: yes
+
+- name: Remove the zip package
+  file:
+    path: /tmp/latest.zip
+    state: absent
+
+- name: Copy the entire content from /tmp/wordpress to /usr/share/nginx/html
+  synchronize:
+    src: /tmp/wordpress
+    dest: /usr/share/nginx/html/
+  delegate_to: "{{ inventory_hostname }}"
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Amazon"
+
+- name: Copy the entire content from /tmp/wordpress to /usr/share/nginx/html
+  synchronize:
+    src: /tmp/wordpress/
+    dest: /var/www/html/
+  delegate_to: "{{ inventory_hostname }}"
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+
+- name: Remove Nginx default index.html (Debian or Ubuntu)
+  file:
+    path: /var/www/html/index.nginx-debian.html
+    state: absent
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+
+- name: Remove Nginx default index.html (CentOS or Amazon)
+  file:
+    path: /usr/nginx/html/index.html
+    state: absent
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Amazon"  
+    
+
+- name: Rename Wordpress file
+  command: chdir=/var/www/html mv wp-config-sample.php wp-config.php
+
+
+- name: Regex alterar configuracoes do base wordpress.
+  replace: path=/var/www/html/wp-config.php regexp={{item.regexp}} replace={{item.replace}}
+  with_items:
+    - {'regexp': "define\\('DB_NAME', '(.)+'\\);", 'replace': "define('DB_NAME', '{{ database }}');"}
+    - {'regexp': "define\\('DB_USER', '(.)+'\\);", 'replace': "define('DB_USER', '{{ user }}');"}
+    - {'regexp': "define\\('DB_PASSWORD', '(.)+'\\);", 'replace': "define('DB_PASSWORD', '{{ password }}');"}
+
+- name: Criar diretorio do certificado SSL
+  file:
+    path: /etc/nginx/ssl
+    state: directory
+    mode: 0755
+
+- name: Geração do certificado SSL auto-assinado p/ HTTPS
+  command: chdir=/etc/nginx/ssl openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout ca.key -out ca.crt -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=Rivendel Tecnologia/OU=IT/CN=localhost/emailAddress=felipe.silva@rivendel.com.br"  
+
+- name: Copiar default para diretorio do nginx
+  copy: 
+    src: ../files/default 
+    dest: /etc/nginx/sites-available/default
+
+- name: Restart do serviço do Nginx, para atualizar as novas confs.
+  service: 
+    name: nginx
+    state: restarted

@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: yes
+  user: vagrant
+  
+  #tasks:
+  #  - ping:
+  roles:
+    - kubernetes

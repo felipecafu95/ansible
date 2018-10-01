@@ -1,0 +1,15 @@
+---
+- name: download docker
+  get_url:
+    url: "{{ get_docker }}"
+    dest: /tmp/docker.sh
+    mode: 0775
+
+- name: executing docker.sh
+  shell: /tmp/docker.sh
+  
+- name: add user in a docker group
+  user: 
+    user: "{{ user }}"
+    groups: docker
+    append: yes

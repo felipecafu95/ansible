@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+# chkconfig: 35 90 12
+# description: Foo server
+#
+
+# Get function from functions library
+. /etc/init.d/functions
+
+SERVICE="prometheus"
+CONFIG_FILE="/etc/prometheus/prometheus.yml"
+
+# Start the Prometheus service
+start() {
+        initlog -c "echo -n Starting Prometheus service: "
+        /usr/local/bin/prometheus --config.file="$CONFIG_FILE" &
+        ### Create the lock file ###
+        touch /var/run/prometheus.pid
+        success $"Prometheus service starts"
+        echo
+}
+
+# Restart the service FOO
+stop() {
+        initlog -c "echo -n Stopping Prometheus service: "
+        killproc $SERVICE
+        ### Now, delete the lock file ###
+        rm -f /var/run/prometheus.pid
+        echo
+}
+
+### main logic ###
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  status)
+        status $SERVICE
+        ;;
+  restart|reload|condrestart)
+        stop
+        start
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+esac
+
+exit 0

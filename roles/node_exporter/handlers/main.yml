@@ -1,0 +1,10 @@
+---
+- name: restart node_exporter
+  service:
+    name: node_exporter
+    state: restarted
+
+- name: enable node_exporter
+  service:
+    name: node_exporter
+    enabled: yes
