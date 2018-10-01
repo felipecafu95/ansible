@@ -46,24 +46,14 @@
   when: ansible_os_family == "Debian"
 
 - name: Copy the logstash default conf
-  copy:
-    src: ../files/logstash.yml
+  template:
+    src: ../templates/logstash.j2
     dest: /etc/logstash/logstash.yml
+    owner: root
+    group: root
+    mode: '644'
 
-- name: Create a extra lib directory
-  file:
-    path: /usr/share/logstash/libext
-    state: directory
-    mode: 0755
-
-- name: Copy jar file to extra directory
-  copy:
-    src: ../files/oracle-jdbc6-11.2.0.3.0.jar
-    dest: /usr/share/logstash/libext/
-    
-
-- name: Copy the conf file to extra conf directory
-  copy:
-    src: ../files/painelnegocios.conf
-    dest: /etc/logstash/conf.d/
-     
+- name: Restart the service
+  service:
+    name: logstash
+    state: restarted
