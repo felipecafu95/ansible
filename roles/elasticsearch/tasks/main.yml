@@ -1,0 +1,57 @@
+---
+
+- name: Download Elasticsearch {{ version }}
+  get_url:
+    url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ version }}.deb
+    dest: /tmp
+  when: ansible_os_family == "Debian"
+
+- name: Download Elasticsearch {{ version }}
+  get_url:
+    url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ version }}.rpm
+    dest: /tmp
+  when: ansible_os_family == "RedHat" or ansible_distribution == "Amazon"
+
+- name: Install from a .deb package
+  apt:
+    deb: /tmp/elasticsearch-{{ version }}.deb
+  when: ansible_os_family == "Debian"
+
+- name: Install from a .rpm package
+  yum:
+    name: /tmp/elasticsearch-{{ version }}.rpm
+    state: present
+  when: ansible_os_family == "RedHat" or ansible_distribution == "Amazon"
+
+- name: Start service Elasticsearch, if not running
+  service:
+    name: elasticsearch
+    state: started
+
+- name: Enable service Elasticsearch, and not touch the running state
+  service:
+    name: elasticsearch
+    enabled: yes
+
+- name: Wait 300 seconds for port 9200 to become open on the host, don't start checking for 10 seconds
+  wait_for:
+    port: 9200
+    delay: 5
+
+- name: Remove the downloaded package
+  file:
+    path: /tmp/elasticsearch-{{ version }}.rpm
+    state: absent
+  when: ansible_os_family == "RedHat" or ansible_distribution == "Amazon"
+
+- name: Remove the downloaded package
+  file:
+    path: /tmp/elasticsearch-{{ version }}.deb
+    state: absent
+  when: ansible_os_family == "Debian"
+
+- name: Copy the Elasticsearch default file 
+  copy:
+    src: ../files/elasticsearch.yml
+    dest: /etc/elasticsearch/elasticsearch.yml
+    

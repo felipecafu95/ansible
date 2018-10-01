@@ -1,0 +1,65 @@
+---
+
+- name: Download and Unzip Node Exporter
+  get_url:
+    url: https://github.com/prometheus/node_exporter/releases/download/v{{ node_version }}/node_exporter-{{ node_version }}.linux-amd64.tar.gz
+    dest: /tmp/node_exporter-{{ node_version }}.linux-amd64.tar.gz
+
+- name: Unzip the Node Exporter zip package
+  unarchive:
+    src: /tmp/node_exporter-{{ node_version }}.linux-amd64.tar.gz
+    dest: /tmp/
+    remote_src: yes
+
+- name: Copy the Node Exporter binary to the system path
+  copy:
+    src: /tmp/node_exporter-{{ node_version }}.linux-amd64/node_exporter
+    dest: /usr/local/bin/
+    remote_src: yes
+
+- name: Removing the zip package
+  file:
+    path: /tmp/node_exporter-{{ node_version }}.linux-amd64.tar.gz
+    state: absent
+
+- name: Removing the node_exporter directory
+  file:
+    state: "{{ item }}"
+    path: /tmp/node_exporter-{{ node_version }}.linux-amd64/
+  with_items:
+    - absent
+    - directory 
+
+- name: Create Node Exporter user
+  user:
+    name: node_exporter
+    shell: /bin/false
+
+- name: Setting up permissions to Node Exporter user execute the binary file
+  file:
+    path: /usr/local/bin/node_exporter
+    owner: node_exporter
+    group: node_exporter
+    mode: 0755
+
+- name: Copy the node_exporter (systemd)
+  copy:
+    src: ../files/node_exporter.service
+    dest: /etc/systemd/system/
+    mode: 0644
+  notify:
+    - restart node_exporter
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu" or ansible_distribution == "CentOS"
+
+- name: Copy the node_exporter (initd)
+  copy:
+    src: ../files/node_exporter
+    dest: /etc/init.d/node_exporter
+    mode: 0755
+  when: ansible_distribution == "Amazon"
+  notify:
+    - restart node_exporter
+    - enable node_exporter
+
+
+    

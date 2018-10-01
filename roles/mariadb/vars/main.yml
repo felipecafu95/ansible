@@ -1,0 +1,4 @@
+---
+mariadb_version: 10.3
+ubuntu_version: "{{ ansible_distribution_release }}"
+debian_version: "{{ ansible_distribution_release }}"

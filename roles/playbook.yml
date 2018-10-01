@@ -1,0 +1,9 @@
+---
+- hosts: server
+  become: yes
+  user: ec2-user
+  
+  tasks:
+    - ping:
+  #roles:
+  #  - timedate

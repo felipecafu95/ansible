@@ -1,0 +1,4 @@
+---
+rundeck_repo: http://repo.rundeck.org/latest.rpm
+rundeck: rundeck
+service: rundeckd

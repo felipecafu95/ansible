@@ -1,0 +1,69 @@
+---
+
+- name: Download Logstash  {{ version }}
+  get_url:
+    url: https://artifacts.elastic.co/downloads/logstash/logstash-{{ version }}.deb
+    dest: /tmp
+  when: ansible_os_family == "Debian"
+
+- name: Download Logstash  {{ version }}
+  get_url:
+    url: https://artifacts.elastic.co/downloads/logstash/logstash-{{ version }}.rpm
+    dest: /tmp
+  when: ansible_os_family == "RedHat" or ansible_distribution == "Amazon"
+
+- name: Install from a .deb package
+  apt:
+    deb: /tmp/logstash-{{ version }}.deb
+  when: ansible_os_family == "Debian"
+
+- name: Install from a .rpm package
+  yum:
+    name: /tmp/logstash-{{ version }}.rpm
+    state: present
+  when: ansible_os_family == "RedHat" or ansible_distribution == "Amazon"
+
+- name: Start service logstash, if not running
+  service:
+    name: logstash
+    state: started
+
+- name: Enable service logstash, and not touch the running state
+  service:
+    name: logstash
+    enabled: yes
+
+- name: Remove the downloaded package
+  file:
+    path: /tmp/logstash-{{ version }}.rpm
+    state: absent
+  when: ansible_os_family == "RedHat" or ansible_distribution == "Amazon"
+
+- name: Remove the downloaded package
+  file:
+    path: /tmp/logstash-{{ version }}.deb
+    state: absent
+  when: ansible_os_family == "Debian"
+
+- name: Copy the logstash default conf
+  copy:
+    src: ../files/logstash.yml
+    dest: /etc/logstash/logstash.yml
+
+- name: Create a extra lib directory
+  file:
+    path: /usr/share/logstash/libext
+    state: directory
+    mode: 0755
+
+- name: Copy jar file to extra directory
+  copy:
+    src: ../files/oracle-jdbc6-11.2.0.3.0.jar
+    dest: /usr/share/logstash/libext/
+    
+
+- name: Copy the conf file to extra conf directory
+  copy:
+    src: ../files/painelnegocios.conf
+    dest: /etc/logstash/conf.d/
+     
