@@ -13,7 +13,7 @@ Make sure do you change to your host, user and access key.
 
 The change should be made in `'yourdirectory/ansible/inventory/hosts'`
 
-You can the example below:
+You can follow the example below:
 
 	[your_host_group]
 	192.168.1.1     ansible_user=your-user   ansible_ssh_private_key_file=/path/to/your/key
