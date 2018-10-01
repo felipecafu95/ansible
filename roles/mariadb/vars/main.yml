@@ -1,4 +1,0 @@
----
-mariadb_version: 10.3
-ubuntu_version: xenial
-debian_version: jessie

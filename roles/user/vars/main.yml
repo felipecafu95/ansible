@@ -1,5 +1,0 @@
----
-new_group: aws
-group_name: adm,wheel
-user_name: felipe
-shell: /bin/bash
