@@ -10,4 +10,4 @@ This repository contains some Ansible roles to provisioning any resources like N
 
 A basic example. Provisioning nginx web server in a new instance.
 
-![](http://i.imgur.com/LBwADSJ.gif)
+![](https://i.imgur.com/4qKcUI5.gif)
