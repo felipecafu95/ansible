@@ -1,2 +1,2 @@
-[teste]
-54.233.193.216
+[webservers]
+192.168.1.1	ansible_user=my-user		ansible_ssh_private_key_file=my-key.pem
