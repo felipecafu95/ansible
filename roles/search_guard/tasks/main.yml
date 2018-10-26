@@ -1,0 +1,148 @@
+---
+
+- name: Stop elasticsearch
+  service:
+    name: elasticsearch
+    state: stopped
+
+- name: Download and install Search Guard plugin for Elasticsearch
+  command: /usr/share/elasticsearch/bin/elasticsearch-plugin install -b com.floragunn:search-guard-6:{{ es_version }}-23.1
+
+- name: Download and install Search Guard plugin for Kibana
+  command: /usr/share/kibana/bin/kibana-plugin install https://repo1.maven.org/maven2/com/floragunn/search-guard-kibana-plugin/{{ kibana_version }}-15/search-guard-kibana-plugin-{{ kibana_version }}-15.zip
+
+- name: Create a folder for the Search Guard CG below
+  file:
+    path: "{{ es_dir }}/tlstool"
+    state: directory
+    mode: 0755
+
+- name: Copy elasticsearch template file 
+  template:
+    src: elasticsearch.yml
+    dest: /etc/elasticsearch/elasticsearch.yml
+  notify: restart elasticsearch
+
+- name: Download Search Guard certificates generator
+  get_url:
+    url: https://search.maven.org/remotecontent?filepath=com/floragunn/search-guard-tlstool/1.5/search-guard-tlstool-1.5.tar.gz
+    dest: "{{ es_dir }}/tlstool/tlstool.tar.gz"
+    mode: 644
+
+- name: Unzip the package
+  unarchive:
+    src: "{{ es_dir }}/tlstool/tlstool.tar.gz"
+    dest: "{{ es_dir }}/tlstool/"
+    remote_src: yes
+
+- name: Remove the zip package download above
+  file:
+    path: "{{ es_dir }}/tlstool/tlstool.tar.gz"
+    state: absent
+
+- name: Copying a file to use as a template to certificates generation
+  template:
+    src: gerar-certs.yml
+    dest: "{{ es_dir }}/tlstool/config/gerar-certs.yml"
+
+- name: Get some informations about the node
+  command: curl http://169.254.169.254/latest/meta-data/hostname
+  register: node_hostname 
+
+- name: Get some informations about the node
+  command: curl http://169.254.169.254/latest/meta-data/local-ipv4
+  register: node_ipv4  
+  
+- name: Replace some informations about the node
+  replace:
+    path: "{{ es_dir }}/tlstool/config/gerar-certs.yml"
+    regexp: 'hostname'
+    replace: '{{ node_hostname.stdout }}'
+
+- name: Replace some informations about the node
+  replace:
+    path: "{{ es_dir }}/tlstool/config/gerar-certs.yml"
+    regexp: '0.0.0.0'
+    replace: '{{ node_ipv4.stdout }}'
+
+- name: Start the certificates generation
+  command: "{{ es_dir }}/tlstool/tools/sgtlstool.sh -c ../config/gerar-certs.yml -ca -crt"
+  args:
+    chdir: "{{ es_dir }}/tlstool/tools/"
+
+-  name: Create a folder for Elasticsearch certificates
+   file:
+    path: "{{ es_cert }}"
+    state: directory
+    owner: root
+    group:
+    mode: 0755
+
+- name: Copy files with multiple changes
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{item.mode}}"
+    remote_src: yes
+  with_items:
+    - { src: '/usr/share/elasticsearch/plugins/search-guard-6/tools/tlstool/tools/out/{{cluster_name}}.pem', dest: '/etc/elasticsearch/certificates/{{cluster_name}}.pem', mode: '0644'}
+    - { src: '/usr/share/elasticsearch/plugins/search-guard-6/tools/tlstool/tools/out/{{cluster_name}}.key', dest: '/etc/elasticsearch/certificates/{{cluster_name}}.key', mode: '0644'}
+    - { src: '/usr/share/elasticsearch/plugins/search-guard-6/tools/tlstool/tools/out/node1_http.key', dest: '/etc/elasticsearch/certificates/node1_http.key', mode: '0644'}
+    - { src: '/usr/share/elasticsearch/plugins/search-guard-6/tools/tlstool/tools/out/node1_http.pem', dest: '/etc/elasticsearch/certificates/node1_http.pem', mode: '0644'}
+    - { src: '/usr/share/elasticsearch/plugins/search-guard-6/tools/tlstool/tools/out/node1.pem', dest: '/etc/elasticsearch/certificates/node1.pem', mode: '0644'}
+    - { src: '/usr/share/elasticsearch/plugins/search-guard-6/tools/tlstool/tools/out/node1.key', dest: '/etc/elasticsearch/certificates/node1.key', mode: '0644'}
+    - { src: '/usr/share/elasticsearch/plugins/search-guard-6/tools/tlstool/tools/out/root-ca.pem', dest: '/etc/elasticsearch/certificates/root-ca.pem', mode: '0644'}
+    - { src: '/usr/share/elasticsearch/plugins/search-guard-6/tools/tlstool/tools/out/root-ca.key', dest: '/etc/elasticsearch/certificates/root-ca.key', mode: '0644'}
+ 
+- name: Add some new informations to Elasticsearch
+  shell: cat "{{ es_dir }}/tlstool/tools/out/node1_elasticsearch_config_snippet.yml" >> /etc/elasticsearch/elasticsearch.yml
+
+- name: Replace some informations about the node
+  replace:
+    path: "{{ es_default }}/elasticsearch.yml"
+    regexp: "{{ item.src }}"
+    replace: "{{ item.dest }}"
+  with_items:
+    - { src: 'node1.pem', dest: '{{ cert }}/node1.pem'}
+    - { src: 'node1.key', dest: '{{ cert }}/node1.key'}
+    - { src: 'node1_http.pem', dest: '{{ cert }}/node1_http.pem'}
+    - { src: 'node1_http.key', dest: '{{ cert }}/node1_http.key'}
+    - { src: 'root-ca.pem', dest: '{{ cert }}/root-ca.pem'}
+
+- name: Start Elasticsearch
+  service:
+    name: elasticsearch
+    state: started
+
+- name: Give execute permission to sgadmin script
+  file:
+    path: "{{ sgadmin_sh }}"
+    mode: 0755
+
+- name: Run the sgadmin script
+  command: "{{ sgadmin_sh }} -cd {{ sg_config }} -cn {{cluster_name }} -nhnv -cacert {{ es_cert }}/root-ca.pem -cert {{ es_cert }}/{{client_name}}.pem -key {{es_cert}}/{{client_name}}.key"
+
+- name: Copy kibana template file 
+  template:
+    src: kibana.yml
+    dest: /etc/kibana/kibana.yml
+    owner: kibana
+    group: kibana
+
+- name: Add some permissions
+  file:
+    path: /usr/share/kibana/optimize/
+    state:  directory
+    owner: kibana
+    recurse: yes
+
+- name: Restart Kibana service
+  service:
+    name: kibana
+    state: restarted    
+
+- name: Wait 150 seconds for port 5601 to become open on the host.
+  wait_for:
+    port: 5601
+    delay: 150
+  

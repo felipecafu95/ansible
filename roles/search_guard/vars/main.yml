@@ -1,0 +1,15 @@
+---
+cluster_name: elasticsearch-dev
+path_data: /var/lib/elasticsearch
+path_logs: /var/log/elasticsearch
+es_version: 6.4.1
+kibana_version: 6.4.1
+es_dir: /usr/share/elasticsearch/plugins/search-guard-6/tools
+pwd_option: none
+es_default: /etc/elasticsearch
+es_cert: /etc/elasticsearch/certificates
+client_name: elasticsearch-dev
+sgadmin_sh: /usr/share/elasticsearch/plugins/search-guard-6/tools/sgadmin.sh
+certificates_folder: /usr/share/elasticsearch/plugins/search-guard-6/tools/tlstool/tools/out
+cert: certificates
+sg_config: /usr/share/elasticsearch/plugins/search-guard-6/sgconfig
