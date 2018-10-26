@@ -38,14 +38,11 @@
     path: /tmp/kibana-{{ version }}-x86_64.rpm
     state: absent
   when: ansible_os_family == "RedHat" or ansible_distribution == "Amazon"
+  notify: restart kibana
 
 - name: Remove the downloaded package
   file:
     path: /tmp/kibana-{{ version }}-amd64.deb
     state: absent
   when: ansible_os_family == "Debian"
-
-- name: Copy Kibana default file
-  copy:
-    src: ../files/kibana.yml
-    dest: /etc/kibana/kibana.yml
+  notify: restart kibana

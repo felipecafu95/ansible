@@ -1,5 +1,5 @@
 ---
-version: 6.4.0
-cluster_name: my_cluster
+version: 6.4.1
+cluster_name: elasticsearch-dev
 log_path: /var/log/elasticsearch
 data_path: /var/lib/elasticsearch
