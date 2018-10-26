@@ -1,0 +1,10 @@
+cluster.name: "{{ cluster_name }}"
+node.name: ${HOSTNAME} 
+node.master: true
+node.data: true
+bootstrap.memory_lock: false
+path.data: "{{ path_data }}"
+path.logs: "{{ path_logs }}"
+network.host: 0.0.0.0
+xpack.security.enabled: false
+xpack.monitoring.collection.enabled: true
