@@ -1,11 +1,21 @@
 ---
-- name: update the repositories cache
+- name: Update the repositories cache
   apt:
     update_cache: yes
 
-- name: install some package
+- name: Update all packages to the latest version
   apt:
-    name: "{{ item }}"
+    upgrade: dist
+
+- name: Install some packages
+  apt:
+    name: "{{ packages }}"
     state: present
-  with_items:
+  vars:
+    packages:
     - "vim"
+    - "tcpdump"
+    - "dnsutils"
+    - "whois"
+  notify:
+    - apt-get clean  

@@ -14,7 +14,7 @@ elasticsearch.ssl.verificationMode: none
 elasticsearch.requestHeadersWhitelist: [ "Authorization", "sgtenant" ]
 xpack.security.enabled: false
 searchguard.auth.type: "basicauth"
-searchguard.basicauth.login.brandimage: https://media.lovemondays.com.br/logos/231fb9/vr-beneficios-original.png
+searchguard.basicauth.login.brandimage: https://media/company-logo.png
 searchguard.basicauth.login.title: "Acesso ao Kibana"
 searchguard.basicauth.login.subtitle: "Se você não possui acesso, solicite ao administrador do sistema."
 searchguard.basicauth.login.buttonstyle: "Entrar"

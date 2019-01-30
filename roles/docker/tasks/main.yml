@@ -1,15 +1,17 @@
 ---
-- name: download docker
+- name: Download docker script installation
   get_url:
     url: "{{ get_docker }}"
     dest: /tmp/docker.sh
     mode: 0775
 
-- name: executing docker.sh
+- name: Executing docker.sh
   shell: /tmp/docker.sh
   
-- name: add user in a docker group
+- name: Add user in a Docker group
   user: 
     user: "{{ user }}"
     groups: docker
     append: yes
+  notify:
+    - start docker

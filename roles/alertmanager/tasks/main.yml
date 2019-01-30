@@ -1,0 +1,68 @@
+---
+
+- name: Downloading AlertManager version {{ am_version }} 
+  get_url:
+    url: https://github.com/prometheus/alertmanager/releases/download/v0.15.2/alertmanager-{{ am_version }}.linux-amd64.tar.gz
+    dest: /tmp/
+
+- name: Unziping AlertManager package
+  unarchive:
+    src: "/tmp/alertmanager-{{ am_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/"
+    remote_src: yes
+
+- name: Creating some directories
+  file: 
+    path: "{{ item }}"
+    state: directory
+    mode: 0775
+  with_items:
+    - "/var/lib/alertmanager/data"
+    - "/etc/alertmanager"
+
+- name: Moving AlertManager binary 
+  copy:
+    src: "/tmp/alertmanager-{{ am_version }}.linux-amd64/alertmanager"
+    dest: "/usr/local/bin/"
+    mode: 0775
+    owner: prometheus
+    group: prometheus
+    remote_src: yes
+
+- name: Adding AlertManager config template
+  copy:
+    src: "../files/alertmanager.yml"
+    dest: "/etc/alertmanager/"
+
+- name: Creating AlertManager service
+  copy:
+    src: "../files/alertmanager.service"
+    dest: "/etc/systemd/system/alertmanager.service"
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+
+
+- name: Reloading daemon for Alertmanager
+  systemd: 
+    daemon_reload: yes
+  notify: restart alertmanager
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+
+
+- name: Copying AlertManager service for "SystemV"
+  copy:
+    src: ../files/{{ item }}
+    dest: /etc/rc.d/init.d/{{ item }}
+    mode: 0775
+  with_items:
+    - alertmanager
+  notify: restart alertmanager
+  when: ansible_distribution == "Amazon"
+
+
+- name: Enable AlertManager service
+  service:
+    name: "{{ item }}"
+    enabled: yes
+  with_items:
+    - alertmanager
+  when: ansible_distribution == "Amazon"

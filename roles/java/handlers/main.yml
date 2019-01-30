@@ -1,0 +1,8 @@
+----
+
+- name: apt-get clean
+  apt:
+    autoclean: yes
+
+- name: yum clean all
+  shell: yum clean all

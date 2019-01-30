@@ -1,12 +1,26 @@
 ---
-- name: download and install java from debian family
+- name: Download and install Java for Debian
   apt:
-    name: "{{ java_apt }}"
+    name: "{{ packages }}"
     state: present
   when: ansible_os_family == "Debian"
+  vars:
+    packages:
+      - "openjdk-8-jre"
+      - "openjdk-8-jdk"
+      - "openjdk-8-jdk-headless"
+      - "openjdk-8-jre-headless"
+  notify:
+    - apt-get clean
 
-- name: download and install java from redhat family 
+- name: Download and install Java for RHEL
   yum:
-    name: "{{ java_rpm }}.x86_64"
+    name:
+      - nginx
+      - postgresql
+      - postgresql-server
     state: present
-  when: ansible_distribution == "Amazon" or ansible_os_family == "CentOS"
+
+  when: ansible_distribution == "Amazon" or ansible_os_family == "CentOS"]
+  notify:
+    - yum clean all

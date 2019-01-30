@@ -1,3 +1,2 @@
 ---
-java_apt: openjdk-8-jdk
-java_rpm: java-1.8.0-openjdk
+java_version:

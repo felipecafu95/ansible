@@ -1,32 +1,26 @@
 ---
-- name: add group
+- name: Adding new group
   group:
     name: "{{ new_group }}"
     state: present
 
-- name: Add the user(s) "{{ user_name }}" with a bash shell, appending the groups "{{ new_group }}" and "{{ new_group }}".
+- name: Add the user(s) with a bash shell
   user:
-    name: "{{ item.name }}"
+    name: "{{ item.key }}"
     shell: "{{ shell }}"
-    groups: "{{ item.groups }}"
     group: "{{ group_name }}"
     append: yes
     generate_ssh_key: no
-  with_items:
-   - { name: "{{ user_name }}", groups: "{{ new_group }}" }
+  with_dict : "{{ users }}" 
   
-
 - name: Set authorized key taken from file
   authorized_key:
-    user: "{{ item.username }}"
+    user: "{{ item.key }}"
     state: present
     key: "{{ lookup('file', '../files/{{ item.key }}.pub') }}"
-  with_items:
-    - { username: "{{ user_name }}", key: "{{ user_name }}" }
-    
+  with_dict : "{{ users }}"    
 
-- name: remove the new user password
-  shell: passwd -d "{{ item }}"
-  with_items:
-    - "{{ user_name }}"
+- name: Removing password from the new user
+  shell: passwd -d "{{ item.key }}"
+  with_dict : "{{ users }}"
   
