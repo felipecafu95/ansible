@@ -1,0 +1,35 @@
+global:
+  scrape_interval:    10s
+  evaluation_interval: 20s
+rule_files:
+ - 'alert.rules'
+
+alerting:
+  alertmanagers:
+  - scheme: http
+    static_configs:
+    - targets:
+      - "localhost:9093"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+         - targets: ['localhost:9090']
+         
+  - job_name: 'ecs-instances'
+    scrape_interval: 30s
+    ec2_sd_configs:
+      - region: us-east-2
+        port: 9100
+    relabel_configs:
+      - source_labels: [__meta_ec2_tag_Name]
+        regex: instance-.*
+        action: keep
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Env]
+        regex: develop
+        action: keep
+      - source_labels: [__meta_ec2_tag_Env]
+        target_label: env

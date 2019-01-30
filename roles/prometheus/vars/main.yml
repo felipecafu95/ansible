@@ -1,3 +1,4 @@
 ---
-prometheus_version: 2.3.0
-node_version: 0.16.0
+prometheus_version: 2.5.0
+external_url: prometeus-develop.domain.io
+tsdb_path: /var/lib/prometheus/data

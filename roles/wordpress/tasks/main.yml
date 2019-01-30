@@ -60,28 +60,25 @@
   command: chdir=/var/www/html mv wp-config-sample.php wp-config.php
 
 
-- name: Regex alterar configuracoes do base wordpress.
+- name: Regex to replace some vars
   replace: path=/var/www/html/wp-config.php regexp={{item.regexp}} replace={{item.replace}}
   with_items:
     - {'regexp': "define\\('DB_NAME', '(.)+'\\);", 'replace': "define('DB_NAME', '{{ database }}');"}
     - {'regexp': "define\\('DB_USER', '(.)+'\\);", 'replace': "define('DB_USER', '{{ user }}');"}
     - {'regexp': "define\\('DB_PASSWORD', '(.)+'\\);", 'replace': "define('DB_PASSWORD', '{{ password }}');"}
 
-- name: Criar diretorio do certificado SSL
+- name: Create directory for SSL certificates
   file:
     path: /etc/nginx/ssl
     state: directory
     mode: 0755
 
-- name: Geração do certificado SSL auto-assinado p/ HTTPS
+- name: Generate auto-signed SSL certificates
   command: chdir=/etc/nginx/ssl openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout ca.key -out ca.crt -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=Rivendel Tecnologia/OU=IT/CN=localhost/emailAddress=felipe.silva@rivendel.com.br"  
 
-- name: Copiar default para diretorio do nginx
+- name: Copy defautl configuration file
   copy: 
     src: ../files/default 
     dest: /etc/nginx/sites-available/default
-
-- name: Restart do serviço do Nginx, para atualizar as novas confs.
-  service: 
-    name: nginx
-    state: restarted
+ notify:
+   - restart nginx

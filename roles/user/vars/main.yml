@@ -1,6 +1,4 @@
 ---
 new_group: 
 group_name: 
-group_name: 
-user_name: 
-shell: 
+shell: /bin/bash
