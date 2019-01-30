@@ -21,6 +21,8 @@
     name: jenkins
     state: present
   when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+  notify:
+    - start jenkins
 
 - name: Add Jenkins repository (RedHat)
   yum_repository:
@@ -40,3 +42,5 @@
     name: jenkins
     state: present
   when: ansible_os_family == "RedHat"
+  notify:
+    - start jenkins

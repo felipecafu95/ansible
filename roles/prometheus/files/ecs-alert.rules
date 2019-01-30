@@ -1,0 +1,77 @@
+groups:
+- name: alerts
+  rules:
+  # Alert for any instance that is unreachable for > 1 minute.
+  - alert: service_down
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+ 
+  # Alert for any instance that is high load > 0.5 for more than 1 minute.
+  - alert: high_load
+    expr: node_load1 > 0.5
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} under high load"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} is under high load."
+
+  - alert: ecs_up
+    expr: ecs_up == 0
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      summary: "The ECS Cluster maybe down, please check it!"
+      description: "Your ECS Cluster, maybe not ok"    
+
+  - alert: ecs_container_instance_active
+    expr: ecs_container_instance_active == 0
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      summary: "The ECS instances maybe down, please check it!"
+      description: "Your ECS instances, maybe not ok" 
+
+  - alert: ecs_service_pending_tasks
+    expr: ecs_service_pending_tasks != 0
+    for: 30s
+    labels:
+      severity: page
+    annotations:
+      summary: "Some ECS tasks are still pending, please check it!"
+      description: "Maybe your task contains errors"
+  
+  - alert: ecs_service_running_tasks
+    expr: ecs_service_running_tasks == 0  
+    for: 45s
+    labels:
+      severity: page
+    annotations:
+      summary: "Something is wrong! No services are running"
+      description: "Check it! No service are running for 45s"
+
+  - alert: node_memory_MemAvailable_bytes
+    expr: node_memory_MemAvailable_bytes < 1000000000  
+    for: 1m
+    labels:
+      severity: page
+    annotations:
+      summary: "Something is wrong! {{ $labels.instance }} had less than 1Gb of RAM available!"
+      description: "Check it now!"
+
+
+  - alert: node_filesystem_size_bytes
+    expr: node_filesystem_free_bytes{mountpoint="/"} < 2000000000  
+    for: 5m
+    labels:
+      severity: page
+    annotations:
+      summary: "Something is wrong! {{ $labels.instance }} had less than 2Gb of disk space available!"
+      description: "Check it now!"

@@ -1,0 +1,7 @@
+---
+
+- name: start rundec
+  service:
+    name: rundeck
+    state: started
+    enabled: yes
