@@ -8,7 +8,7 @@
 ca:
    root:
       # The distinguished name of this CA. You must specify a distinguished name.   
-      dn: CN=root.ca.vrbeneficios.io,OU=ES,O=VR Beneficios,DC=vrbeneficios,DC=io
+      dn: CN=root.ca.domain.com,OU=ES,O=My Domain,DC=domain,DC=com
 
       # The size of the generated key in bits
       keysize: 2048
@@ -31,7 +31,7 @@ ca:
    # the root certificate will be used for signing.         
    intermediate:
       # The distinguished name of this CA. You must specify a distinguished name.
-      dn: CN=signing.ca.vrbeneficios.io,OU=CA,O=VR Beneficios,DC=vrbeneficios,DC=io
+      dn: CN=signing.ca.domain.com,OU=CA,O=My Domain,DC=domain,DC=com
    
       # The size of the generated key in bits   
       keysize: 2048
@@ -105,7 +105,7 @@ defaults:
 #      
 nodes:
   - name: node1
-    dn: CN=node1.vrbeneficios.io,OU=ES,O=VR Beneficios,DC=vrbeneficios,DC=io
+    dn: CN=node1.domain.com,OU=ES,O=My Domain,DC=domain,DC=com
     dns: hostname
     ip: 0.0.0.0
 ###
@@ -119,5 +119,5 @@ nodes:
 #        
 clients:
   - name: "{{cluster_name}}"
-    dn: CN=es-dev.vrbeneficios.io,OU=ES,O=VR Beneficios,DC=vrbeneficios,DC=io
+    dn: CN=elasticsearch.domain.com,OU=ES,O=My Domain,DC=domain,DC=com
     admin: true
