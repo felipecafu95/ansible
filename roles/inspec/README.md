@@ -21,7 +21,7 @@ Example Playbook
 
 ansible-playbook custom-roles.yml -e roles=inspec -e application_name=appA
 
-![](https://i.imgur.com/4qKcUI5.gif)
+![](https://imgur.com/a/U5iE14J)
 
 License
 -------
