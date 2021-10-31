@@ -1,0 +1,12 @@
+# Create folder for tests
+- name: Create the repository for tests
+  file:
+    path: /tmp/inspec_{{ application_name }}
+    state: directory
+
+# Copy templates with tests
+- name: Copy tests for {{ application_name }}
+  copy:
+    src: ./templates/{{ application_name }}
+    dest: /tmp/inspec_{{ application_name }}/
+    mode: '0644'

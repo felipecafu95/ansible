@@ -1,0 +1,4 @@
+- name: Install inspec
+  apt:
+     name: inspec
+     state: present

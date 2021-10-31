@@ -1,0 +1,6 @@
+- name: execute inspec for {{ application_name }}
+  shell: inspec exec /tmp/inspec_{{ application_name}} --reporter=documentation --chef-license=accept
+  register: inspec_result
+
+- debug:
+    var: inspec_result.stdout_lines

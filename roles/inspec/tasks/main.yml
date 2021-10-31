@@ -1,0 +1,11 @@
+---
+# tasks file for inspec
+
+- name: Install  
+  include: install.yml
+
+- name: Config
+  include: config.yml
+
+- name: Exec
+  include: exec.yml
