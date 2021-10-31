@@ -1,0 +1,6 @@
+# How to execute:
+# ansible-playbook custom-role.yml -e roles=NAME-OF-ROLE
+- hosts: localhost
+  connection: local
+  roles:
+    - { role : "{{ roles }}" }
